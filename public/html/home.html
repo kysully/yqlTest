@@ -1,0 +1,18 @@
+<div class="container">
+  <h1>YQL Test <span class="glyphicon glyphicon-pencil"</span> <small>by Ken</small></h1>
+  <hr>
+  <div class="introduction">
+    <h2 class="center">YQL Data</h2>
+    
+  </div>
+  <!-- Let the person input their username and then upon submitting and hitting 
+  join game call the joinGame() function in the angular app -->
+  <form ng-submit="getData()">
+    <div class="form-group">
+      <label for="nameInput">Desired Username:</label>
+      <input type="text" class="form-control" id="nameInput" placholder="username" ng-model="stockName">
+    </div>
+    <button type="submit" class="btn btn-primary" ng-disable="!text">Search Quotes</button>
+  </form>
+  <p ng-model="price">{{price}}</p>
+</div>
