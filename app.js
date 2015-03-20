@@ -5,11 +5,19 @@ var YQL = require('yql');
     socketio = require('socket.io');
     express = require('express');
     colors = require("colors/safe");
+    MongoClient = require('mongodb').MongoClient;
 
     // Start express, the server, and socket.io
 var router = express();
     server = http.createServer(router);
     io = socketio.listen(server);
+
+// Connect to the db
+MongoClient.connect("mongodb://localhost:27017/exampleDb", function(err, db) {
+  if(!err) {
+    console.log("We are connected");
+  }
+});
 
 // Example #1 - Param binding
 new YQL.exec('select * from yahoo.finance.quote where symbol in ("YHOO","AAPL","GOOG","MSFT")', function(response) {
