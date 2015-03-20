@@ -5,21 +5,40 @@ var YQL = require('yql');
     socketio = require('socket.io');
     express = require('express');
     colors = require("colors/safe");
-    MongoClient = require('mongodb').MongoClient;
+    mysql = require('mysql');
 
     // Start express, the server, and socket.io
 var router = express();
     server = http.createServer(router);
     io = socketio.listen(server);
 
-// Connect to the db
-MongoClient.connect("mongodb://localhost:27017/exampleDb", function(err, db) {
-  if(!err) {
-    console.log("We are connected");
+var db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Skywalker21',
+    database: 'node'
+});
+
+db.connect(function(err){
+    if (err){ console.log(err);}
+});
+
+var sql = "SELECT * FROM notes WHERE id = 100";
+db.query(sql, function(err, results){
+  if (err) {
+    console.log(err);
+  }
+  else {
+    if (results.length !==0){
+      console.log(results);
+    }
+    else {
+      console.log("No results");
+    }
   }
 });
 
-// Example #1 - Param binding
+// Quick example on how to query with QYL
 new YQL.exec('select * from yahoo.finance.quote where symbol in ("YHOO","AAPL","GOOG","MSFT")', function(response) {
 
   if (response.error) {
@@ -68,6 +87,41 @@ io.sockets.on("connection", function(socket) {
       }
     });
   });
+
+  socket.on("newUser", function(userName){
+    var sql = "SELECT * FROM usernames WHERE Username = " + userName;
+    db.query(sql, function(err, results){
+      if (err) {
+        console.log(err);
+      }
+      else {
+        if (results.length !==0){
+          console.log("User already exists");
+        }
+        else {
+          console.log("Create user here");
+        }
+      }
+    });
+  });
+
+  socket.on("login", function(userName){
+    var sql = "SELECT * FROM usernames WHERE Username = " + userName;
+    db.query(sql, function(err, results){
+      if (err) {
+        console.log(err);
+      }
+      else {
+        if (results.length !==0){
+          console.log("User did not exist");
+        }
+        else {
+          console.log("User " + userName + "logged in");
+        }
+      }
+    });
+  });
+
 });
 
 // Start the server (taken from Andy which is taken from Cloud9)
