@@ -7,10 +7,19 @@
   </div>
   <!-- Let the person input their username and then upon submitting and hitting 
   join game call the joinGame() function in the angular app -->
-  <form ng-submit="getData()">
+  <form ng-submit="newUser()">
     <div class="form-group">
       <label for="nameInput">Desired Username:</label>
-      <input type="text" class="form-control" id="nameInput" placholder="username" ng-model="stockName">
+      <input type="text" class="form-control" id="nameInput" placholder="username" ng-model="userName">
+    </div>
+    <button type="submit" class="btn btn-primary" ng-disable="!text">Search Quotes</button>
+  </form>
+  <p ng-model="userNameResponse">{{userNameResponse}}</p>
+
+  <form ng-submit="getData()">
+    <div class="form-group">
+      <label for="stockInput">Desired Stock Price:</label>
+      <input type="text" class="form-control" id="stockInput" placholder="JNJ" ng-model="stockName">
     </div>
     <button type="submit" class="btn btn-primary" ng-disable="!text">Search Quotes</button>
   </form>

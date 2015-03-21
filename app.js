@@ -7,11 +7,24 @@ var YQL = require('yql');
     colors = require("colors/safe");
     mysql = require('mysql');
 
+var databaseUrl = "mydb"; // "username:password@example.com/mydb"
+var collections = ["users", "reports"]
+var db = require("mongojs").connect(databaseUrl, collections);
+var myCollection = db.collection('users');
+myCollection.find(function(err, docs) {
+  console.log(docs); // Could error check
+});
+//myCollection.insert({"id": 1, "username": "ken"});
+myCollection.find(function(err, docs) {
+  console.log(docs);
+});
+
     // Start express, the server, and socket.io
 var router = express();
     server = http.createServer(router);
     io = socketio.listen(server);
 
+/*
 var db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -22,6 +35,7 @@ var db = mysql.createConnection({
 db.connect(function(err){
     if (err){ console.log(err);}
 });
+
 
 var sql = "SELECT * FROM notes WHERE id = 100";
 db.query(sql, function(err, results){
@@ -37,6 +51,7 @@ db.query(sql, function(err, results){
     }
   }
 });
+*/
 
 // Quick example on how to query with QYL
 new YQL.exec('select * from yahoo.finance.quote where symbol in ("YHOO","AAPL","GOOG","MSFT")', function(response) {
@@ -45,8 +60,8 @@ new YQL.exec('select * from yahoo.finance.quote where symbol in ("YHOO","AAPL","
     console.log("Example #1... Error: " + response.error.description);
   }
   else {
-        var symbol  = response.query.results.quote[0].symbol;
-        console.log("First symbol is " + symbol);
+    var symbol  = response.query.results.quote[0].symbol;
+    console.log("First symbol is " + symbol);
   }
 });
 
@@ -89,17 +104,21 @@ io.sockets.on("connection", function(socket) {
   });
 
   socket.on("newUser", function(userName){
-    var sql = "SELECT * FROM usernames WHERE Username = " + userName;
-    db.query(sql, function(err, results){
+    //var sql = "SELECT * FROM usernames WHERE Username = " + userName;
+    console.log("New user with requested user name " + userName);
+    var mongoQuery = {"username": userName};
+    myCollection.find(mongoQuery, function(err, docs){
       if (err) {
         console.log(err);
       }
       else {
-        if (results.length !==0){
+        if (docs.length !== 0){
           console.log("User already exists");
         }
         else {
           console.log("Create user here");
+          myCollection.insert({"username": userName});
+          console.log("User " + userName + " created");
         }
       }
     });
@@ -107,12 +126,12 @@ io.sockets.on("connection", function(socket) {
 
   socket.on("login", function(userName){
     var sql = "SELECT * FROM usernames WHERE Username = " + userName;
-    db.query(sql, function(err, results){
+    db.query(sql, function(err, docs){
       if (err) {
         console.log(err);
       }
       else {
-        if (results.length !==0){
+        if (docs.length !== 0){
           console.log("User did not exist");
         }
         else {
@@ -120,6 +139,10 @@ io.sockets.on("connection", function(socket) {
         }
       }
     });
+  });
+
+  socket.on("newPost", function(postData){
+    // 
   });
 
 });

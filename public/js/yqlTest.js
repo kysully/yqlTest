@@ -28,6 +28,11 @@ app.controller("HomeController", ["$scope", "$location",
       socket.emit("stockSearch", symbol);
     };
 
+    $scope.newUser = function() {
+      requestedUsername = $scope.userName;
+      socket.emit("newUser", requestedUsername);
+    }
+
     socket.on("stockFound", function(price) {
       //console.log(userInfo.gameID);
       console.log("The price of this stock is " + price);
