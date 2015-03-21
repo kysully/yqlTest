@@ -110,20 +110,24 @@ io.sockets.on("connection", function(socket) {
     myCollection.find(mongoQuery, function(err, docs){
       if (err) {
         console.log(err);
+        socket.emit("newUserResponse", "error");
       }
       else {
         if (docs.length !== 0){
           console.log("User already exists");
+          socket.emit("newUserResponse", "already exists");
         }
         else {
           console.log("Create user here");
           myCollection.insert({"username": userName});
           console.log("User " + userName + " created");
+          socket.emit("newUserResponse", "created");
         }
       }
     });
   });
 
+/*
   socket.on("login", function(userName){
     var sql = "SELECT * FROM usernames WHERE Username = " + userName;
     db.query(sql, function(err, docs){
@@ -140,9 +144,14 @@ io.sockets.on("connection", function(socket) {
       }
     });
   });
+*/
 
   socket.on("newPost", function(postData){
-    // 
+    // newPost logic to go here
+  });
+
+  socket.on("newComment", function(commentData){
+
   });
 
 });

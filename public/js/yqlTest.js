@@ -39,5 +39,19 @@ app.controller("HomeController", ["$scope", "$location",
       $scope.price = price;
       $scope.$apply();
     });
+
+    socket.on("newUserResponse", function(response){
+      $scope.userNameReponse = response;
+      $scope.$apply();
+      if (response == "error"){
+        console.log("Error occured");
+      }
+      else if (response == "created"){
+        console.log("User created");
+      }
+      else if (response == "userAlreadyExists"){
+        console.log("User already exists");
+      }
+    });
   }
 ]);
