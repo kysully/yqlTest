@@ -12,7 +12,7 @@
       <label for="nameInput">Desired Username:</label>
       <input type="text" class="form-control" id="nameInput" placholder="username" ng-model="userName">
     </div>
-    <button type="submit" class="btn btn-primary" ng-disable="!text">Search Quotes</button>
+    <button type="submit" class="btn btn-primary" ng-disable="!text">Sign Up</button>
   </form>
   <p ng-model="userNameResponse">{{userNameResponse}}</p>
 
@@ -24,4 +24,16 @@
     <button type="submit" class="btn btn-primary" ng-disable="!text">Search Quotes</button>
   </form>
   <p ng-model="price">{{price}}</p>
+
+  <form ng-submit="newPost()">
+    <div class="form-group">
+      <label for="postInput">New Post Name</label>
+      <input type="text" class="form-control" id="newPostInput" placholder="JNJ" ng-model="postName">
+    </div>
+    <button type="submit" class="btn btn-primary" ng-disable="!text">New Post</button>
+  </form>
+  <ul>
+    <li ng-repeat-start="post in posts">{{post.userName}}</li>
+    <li ng-repeat-end>{{post.postName}}</li>
+  </ul>
 </div>

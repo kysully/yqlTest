@@ -15,10 +15,14 @@ app.config(["$routeProvider", "$locationProvider",
 // Connect to the server using socket.io
 var socket = io.connect();
 var symbol = "";
+var userName;
 
 // This controller controls the Home screen
 app.controller("HomeController", ["$scope", "$location",
   function($scope, $location) {
+
+    $scope.posts = [];
+    socket.emit("posts_request");
 
     // Function called when a player wishes to join a game
     $scope.getData = function() {
@@ -31,7 +35,24 @@ app.controller("HomeController", ["$scope", "$location",
     $scope.newUser = function() {
       requestedUsername = $scope.userName;
       socket.emit("newUser", requestedUsername);
+      userName = requestedUsername;
     }
+
+    $scope.newPost = function() {
+      postName = $scope.postName;
+      if (userName){
+        socket.emit("newPost", {"userName": userName, "postName": postName}); // OTHER POST INFO HERE
+      }
+      else {
+        console.log ("User not logged in");
+      }
+    }
+
+    socket.on("post", function(post){
+      console.log("Received Post");
+      $scope.posts.push(post);
+      $scope.$apply();
+    });
 
     socket.on("stockFound", function(price) {
       //console.log(userInfo.gameID);
@@ -41,7 +62,7 @@ app.controller("HomeController", ["$scope", "$location",
     });
 
     socket.on("newUserResponse", function(response){
-      $scope.userNameReponse = response;
+      $scope.userNameResponse = response;
       $scope.$apply();
       if (response == "error"){
         console.log("Error occured");

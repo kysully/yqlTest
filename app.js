@@ -8,16 +8,14 @@ var YQL = require('yql');
     mysql = require('mysql');
 
 var databaseUrl = "mydb"; // "username:password@example.com/mydb"
-var collections = ["users", "reports"]
+var collections = ["users", "posts"]
 var db = require("mongojs").connect(databaseUrl, collections);
-var myCollection = db.collection('users');
-myCollection.find(function(err, docs) {
+var userList = db.collection('users');
+var postList = db.collection('posts');
+userList.find(function(err, docs) {
   console.log(docs); // Could error check
 });
-//myCollection.insert({"id": 1, "username": "ken"});
-myCollection.find(function(err, docs) {
-  console.log(docs);
-});
+//userList.insert({"id": 1, "username": "ken"});
 
     // Start express, the server, and socket.io
 var router = express();
@@ -53,6 +51,37 @@ db.query(sql, function(err, results){
 });
 */
 
+// Function to call when adding a user adds a post
+// NOT TESTED (because I haven't decided what postData is yet)
+// Currently just alters userList to reflect post history
+// Assumes postData has at least a username and is in JSON format
+function addPost(postData){
+  var mongoQuery = {"username": postData.username};
+  userList.update(
+    mongoQuery, // Get the right username
+    {
+      $push: {"posts": postData} // Add the post to this users posts
+    }
+  );
+  postList.insert(postData); // Add the post to the posts database
+  userList.find({"username": postData.userName}, function(err, docs) {
+    console.log(docs[0].posts);
+  });
+  postList.find(function(err, docs) {
+    console.log(docs);
+  });
+}
+
+// Sends literally all the posts
+// If our database were to get big, this is a terrible idea
+function sendPosts(socket){
+  var posts = postList.find();
+  posts.forEach(function(err, doc) {
+    socket.emit("post", doc);
+    console.log("sent post " + doc);
+  });
+}
+
 // Quick example on how to query with QYL
 new YQL.exec('select * from yahoo.finance.quote where symbol in ("YHOO","AAPL","GOOG","MSFT")', function(response) {
 
@@ -86,6 +115,10 @@ router.get("/components/*", function(req, res) {
 // each client
 io.sockets.on("connection", function(socket) {
   console.log("New client from " + colors.green(socket.request.connection.remoteAddress));
+  
+  socket.on("posts_request", function(){
+    sendPosts(socket);
+  });
 
   socket.on("stockSearch", function(symbol){
     console.log (colors.green(socket.request.connection.remoteAddress) + " wants stock " + symbol);
@@ -107,7 +140,7 @@ io.sockets.on("connection", function(socket) {
     //var sql = "SELECT * FROM usernames WHERE Username = " + userName;
     console.log("New user with requested user name " + userName);
     var mongoQuery = {"username": userName};
-    myCollection.find(mongoQuery, function(err, docs){
+    userList.find(mongoQuery, function(err, docs){
       if (err) {
         console.log(err);
         socket.emit("newUserResponse", "error");
@@ -115,11 +148,11 @@ io.sockets.on("connection", function(socket) {
       else {
         if (docs.length !== 0){
           console.log("User already exists");
-          socket.emit("newUserResponse", "already exists");
+          socket.emit("newUserResponse", "userAlreadyExists");
         }
         else {
           console.log("Create user here");
-          myCollection.insert({"username": userName});
+          userList.insert({"username": userName});
           console.log("User " + userName + " created");
           socket.emit("newUserResponse", "created");
         }
@@ -147,6 +180,9 @@ io.sockets.on("connection", function(socket) {
 */
 
   socket.on("newPost", function(postData){
+    console.log("Received new post request");
+    addPost(postData);
+    socket.emit("post", postData);
     // newPost logic to go here
   });
 
