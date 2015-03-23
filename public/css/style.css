@@ -13,7 +13,7 @@ canvas {
   margin: auto;
 }
 
-.messageTable {  
+.messageTable {
     height: 100px !important;
     overflow-y: scroll;
 }
@@ -51,6 +51,19 @@ canvas {
   float:right;
   display: inline-block;
   border-left: 2px solid;
+}
+
+.postUserName{
+  font-size: 16px;
+}
+
+.postName{
+  font-size: 24px;
+  font-weight: bold;
+}
+
+ul {
+  list-style-type: none;
 }
 
 #gameTimer{

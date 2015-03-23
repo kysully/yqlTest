@@ -1,11 +1,11 @@
 <div class="container">
-  <h1>YQL Test <span class="glyphicon glyphicon-pencil"</span> <small>by Ken</small></h1>
+  <h1>YQL Test <span class="glyphicon glyphicon-pencil"></span> <small>by Ken</small></h1>
   <hr>
   <div class="introduction">
-    <h2 class="center">YQL Data</h2>
+    <h2 class="center">Database Example</h2>
     
   </div>
-  <!-- Let the person input their username and then upon submitting and hitting 
+  <!-- Let the person input their username and then upon submitting and hitting
   join game call the joinGame() function in the angular app -->
   <form ng-submit="newUser()">
     <div class="form-group">
@@ -33,7 +33,7 @@
     <button type="submit" class="btn btn-primary" ng-disable="!text">New Post</button>
   </form>
   <ul>
-    <li ng-repeat-start="post in posts">{{post.userName}}</li>
-    <li ng-repeat-end>{{post.postName}}</li>
+    <li ng-repeat-start="post in posts" class="postName">{{post.postName}}</li>
+    <li ng-repeat-end class="postUserName">By: {{post.userName}}</li>
   </ul>
 </div>
