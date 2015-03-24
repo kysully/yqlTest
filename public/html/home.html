@@ -10,7 +10,7 @@
   <form ng-submit="newUser()">
     <div class="form-group">
       <label for="nameInput">Desired Username:</label>
-      <input type="text" class="form-control" id="nameInput" placholder="username" ng-model="userName">
+      <input type="text" class="form-control" id="nameInput" placholder="username" ng-model="username">
     </div>
     <button type="submit" class="btn btn-primary" ng-disable="!text">Sign Up</button>
   </form>
@@ -34,6 +34,6 @@
   </form>
   <ul>
     <li ng-repeat-start="post in posts" class="postName">{{post.postName}}</li>
-    <li ng-repeat-end class="postUserName">By: {{post.userName}}</li>
+    <li ng-repeat-end class="postUserName">By: {{post.username}}</li>
   </ul>
 </div>

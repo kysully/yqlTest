@@ -15,7 +15,7 @@ app.config(["$routeProvider", "$locationProvider",
 // Connect to the server using socket.io
 var socket = io.connect();
 var symbol = "";
-var userName;
+var username;
 
 // This controller controls the Home screen
 app.controller("HomeController", ["$scope", "$location",
@@ -33,15 +33,15 @@ app.controller("HomeController", ["$scope", "$location",
     };
 
     $scope.newUser = function() {
-      requestedUsername = $scope.userName;
+      requestedUsername = $scope.username;
       socket.emit("newUser", requestedUsername);
-      userName = requestedUsername;
+      username = requestedUsername;
     }
 
     $scope.newPost = function() {
       postName = $scope.postName;
-      if (userName){
-        socket.emit("newPost", {"userName": userName, "postName": postName}); // OTHER POST INFO HERE
+      if (username){
+        socket.emit("newPost", {"username": username, "postName": postName}); // OTHER POST INFO HERE
       }
       else {
         console.log ("User not logged in");

@@ -51,25 +51,50 @@ db.query(sql, function(err, results){
 });
 */
 
+// Wraps a post into a JSON object. Only contents and username required. 
+function wrapPost(content, username, upvotes, downvotes, date, comments){
+  console.log("Wrap Post content is " + content);
+  if (comments === undefined){
+    comments = [];
+  }
+  if (upvotes === undefined){
+    upvotes = 0;
+  }
+  if (downvotes === undefined){
+    downvotes = 0;
+  }
+  if (date === undefined){
+    date = new Date(); // Not entirely sure this will work
+  }
+  return {"content": content, "username": username, "date": date, 
+  "upvotes": upvotes, "downvotes": downvotes, "comments": comments};
+}
+
 // Function to call when adding a user adds a post
 // NOT TESTED (because I haven't decided what postData is yet)
 // Currently just alters userList to reflect post history
 // Assumes postData has at least a username and is in JSON format
 function addPost(postData){
+  var post = wrapPost(postData.postName, postData.username);
+  console.log(post);
+  console.log(post.username);
   var mongoQuery = {"username": postData.username};
   userList.update(
     mongoQuery, // Get the right username
     {
-      $push: {"posts": postData} // Add the post to this users posts
+      $push: {"posts": post} // Add the post to this users posts
     }
   );
-  postList.insert(postData); // Add the post to the posts database
-  userList.find({"username": postData.userName}, function(err, docs) {
+  postList.insert(post); // Add the post to the posts database
+  /*
+  userList.find({"username": postData.username}, function(err, docs) {
     console.log(docs[0].posts);
   });
+  
   postList.find(function(err, docs) {
     console.log(docs);
   });
+*/
 }
 
 // Sends literally all the posts
@@ -136,10 +161,10 @@ io.sockets.on("connection", function(socket) {
     });
   });
 
-  socket.on("newUser", function(userName){
-    //var sql = "SELECT * FROM usernames WHERE Username = " + userName;
-    console.log("New user with requested user name " + userName);
-    var mongoQuery = {"username": userName};
+  socket.on("newUser", function(username){
+    //var sql = "SELECT * FROM usernames WHERE Username = " + username;
+    console.log("New user with requested user name " + username);
+    var mongoQuery = {"username": username};
     userList.find(mongoQuery, function(err, docs){
       if (err) {
         console.log(err);
@@ -152,8 +177,8 @@ io.sockets.on("connection", function(socket) {
         }
         else {
           console.log("Create user here");
-          userList.insert({"username": userName});
-          console.log("User " + userName + " created");
+          userList.insert({"username": username});
+          console.log("User " + username + " created");
           socket.emit("newUserResponse", "created");
         }
       }
@@ -161,8 +186,8 @@ io.sockets.on("connection", function(socket) {
   });
 
 /*
-  socket.on("login", function(userName){
-    var sql = "SELECT * FROM usernames WHERE Username = " + userName;
+  socket.on("login", function(username){
+    var sql = "SELECT * FROM usernames WHERE Username = " + username;
     db.query(sql, function(err, docs){
       if (err) {
         console.log(err);
@@ -172,7 +197,7 @@ io.sockets.on("connection", function(socket) {
           console.log("User did not exist");
         }
         else {
-          console.log("User " + userName + "logged in");
+          console.log("User " + username + "logged in");
         }
       }
     });
